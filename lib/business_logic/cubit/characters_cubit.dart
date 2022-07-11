@@ -1,31 +1,30 @@
 import 'package:bloc/bloc.dart';
-import 'package:breaking_bad/data/models/characters.dart';
-import 'package:breaking_bad/data/models/qoutes.dart';
-import 'package:breaking_bad/data/repostories/character_repository.dart';
 import 'package:meta/meta.dart';
+
+import '../../data/models/characters.dart';
+import '../../data/models/quote.dart';
+import '../../data/repository/characters_repository.dart';
 
 part 'characters_state.dart';
 
 class CharactersCubit extends Cubit<CharactersState> {
-  final CharacterRepository characterRepository;
-  dynamic characters=[];
-  CharactersCubit(this.characterRepository) : super(CharactersInitial());
+  final CharactersRepository charactersRepository;
+  List<Character> characters = [];
 
+  CharactersCubit(this.charactersRepository) : super(CharactersInitial());
 
-  dynamic getAllCharacters() {
-    characterRepository.getAllCharacters().then((characters) {
+  List<Character> getAllCharacters() {
+    charactersRepository.getAllCharacters().then((characters) {
       emit(CharactersLoaded(characters));
       this.characters = characters;
     });
+
     return characters;
   }
-  void getQuotes(String charName) {
-    characterRepository.getCharacterQuotes(charName).then((quotes) {
-      emit(QuotesLoaded(quotes));
 
+  void getQuotes(String charName) {
+    charactersRepository.getCharacterQuotes(charName).then((quotes) {
+      emit(QuotesLoaded(quotes));
     });
   }
-
-
-
 }

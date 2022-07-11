@@ -1,5 +1,3 @@
-final baseURL='https://www.breakingbadapi.com/api/';
-/// كدا بيوديني علي الهوم اسكرين
-const charactersScreen='/';
-const charactersDetailsScreen ='/character_details';
-
+final baseUrl = 'https://www.breakingbadapi.com/api/';
+const charactersScreen = '/';
+const characterDetailsScreen = '/character_details';

@@ -1,15 +1,16 @@
 import 'dart:math';
+
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:breaking_bad/business_logic/cubit/characters_cubit.dart';
-import 'package:breaking_bad/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../business_logic/cubit/characters_cubit.dart';
+import '../../constants/my_colors.dart';
 import '../../data/models/characters.dart';
 
-
-class CharactersDetailsScreen extends StatelessWidget {
+class CharacterDetailsScreen extends StatelessWidget {
   final Character character;
-  const CharactersDetailsScreen({Key? key, required this.character})
+
+  const CharacterDetailsScreen({Key? key, required this.character})
       : super(key: key);
 
   Widget buildSliverAppBar() {
@@ -19,12 +20,10 @@ class CharactersDetailsScreen extends StatelessWidget {
       stretch: true,
       backgroundColor: MyColors.myGrey,
       flexibleSpace: FlexibleSpaceBar(
-        //  centerTitle: true,
+        centerTitle: true,
         title: Text(
-          character.nickname,
-          style: const TextStyle(
-            color: MyColors.myWhite,
-          ), //textAlign: TextAlign.start,
+          character.nickName,
+          style: TextStyle(color: MyColors.myWhite),
         ),
         background: Hero(
           tag: character.charId,
@@ -37,61 +36,86 @@ class CharactersDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget characterInfo(String title, String value){
-    return RichText(text:TextSpan(children: [
-      TextSpan(text: title,style:const TextStyle(color: MyColors.myWhite,fontWeight: FontWeight.bold,fontSize: 18,)),
-      TextSpan(text: value,style:const TextStyle(color: MyColors.myWhite,fontWeight: FontWeight.bold,fontSize: 16,)),
-    ]) ,
+  Widget characterInfo(String title, String value) {
+    return RichText(
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: title,
+            style: TextStyle(
+              color: MyColors.myWhite,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          TextSpan(
+            text: value,
+            style: TextStyle(
+              color: MyColors.myWhite,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget buildDivider(double endIndent){
-    return Divider(color: MyColors.myYellow,height: 30, endIndent:endIndent ,thickness: 2,);
+  Widget buildDivider(double endIndent) {
+    return Divider(
+      height: 30,
+      endIndent: endIndent,
+      color: MyColors.myYellow,
+      thickness: 2,
+    );
   }
 
-  Widget checkIfQuotesLoaded(CharactersState state){
-    if(state is QuotesLoaded){
-      return displayRandomQuotesOrEmptySpace(state);
-    }
-    else{
-      return const CircularProgressIndicator(color: MyColors.myYellow,);
+  Widget checkIfQuotesAreLoaded(CharactersState state) {
+    if (state is QuotesLoaded) {
+      return displayRandomQuoteOrEmptySpace(state);
+    } else {
+      return showProgressIndicator();
     }
   }
 
-  displayRandomQuotesOrEmptySpace(CharactersState state){
-
-   /// var quotes= (state).quotes;
-
-    var quotes ;
-    if(quotes .length !=0){
-      int randomQuotesIndex =Random().nextInt(quotes.length - 1);
-      return Center(child: DefaultTextStyle(
-        child:AnimatedTextKit(
-          repeatForever: true,
-          animatedTexts: [
-            FlickerAnimatedText(quotes[randomQuotesIndex].quote),
-          ],
-        ) ,
-        style:const TextStyle(
+  Widget displayRandomQuoteOrEmptySpace(state) {
+    var quotes = (state).quotes;
+    if (quotes.length != 0) {
+      int randomQuoteIndex = Random().nextInt(quotes.length - 1);
+      return Center(
+        child: DefaultTextStyle(
+          textAlign: TextAlign.center,
+          style: TextStyle(
             fontSize: 20,
             color: MyColors.myWhite,
             shadows: [
               Shadow(
-                offset: Offset(0 , 0),
                 blurRadius: 7,
-                  color: MyColors.myYellow
-
-              ),
+                color: MyColors.myYellow,
+                offset: Offset(0, 0),
+              )
             ],
-        )
-        ,textAlign: TextAlign.center,
-      ),
+          ),
+          child: AnimatedTextKit(
+            repeatForever: true,
+            animatedTexts: [
+              FlickerAnimatedText(quotes[randomQuoteIndex].quote),
+            ],
+          ),
+        ),
       );
-    }else{
+    } else {
       return Container();
     }
+  }
+
+  Widget showProgressIndicator() {
+    return Center(
+      child: CircularProgressIndicator(
+        color: MyColors.myYellow,
+      ),
+    );
   }
 
   @override
@@ -106,34 +130,45 @@ class CharactersDetailsScreen extends StatelessWidget {
             delegate: SliverChildListDelegate(
               [
                 Container(
-                  margin: const EdgeInsets.fromLTRB(14, 14, 14, 0),
-                  padding: EdgeInsets.all(8.0),
+                  margin: EdgeInsets.fromLTRB(14, 14, 14, 0),
+                  padding: EdgeInsets.all(8),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      characterInfo('Job : ', character.occupation!.join(' / ')),
+                      characterInfo('Job : ', character.jobs.join(' / ')),
                       buildDivider(315),
-                      characterInfo('Appeared in : ', character.categoryForTwoSeries),
+                      characterInfo(
+                          'Appeared in : ', character.categoryForTwoSeries),
                       buildDivider(250),
-                      characterInfo('seasons: ', character.appearanceOfSeasons!.join(' / ')),
+                      characterInfo('Seasons : ',
+                          character.appearanceOfSeasons.join(' / ')),
                       buildDivider(280),
-                      characterInfo('Job : ', character.statusIfDeadOrAlive),
-                      buildDivider(315),
-                      character.betterCallSaulAppearance!.isEmpty?Container():
-                      characterInfo('Better Cal Saul Seasons : ', character.betterCallSaulAppearance!.join(' / ')),
-                      character.betterCallSaulAppearance!.isEmpty?Container():buildDivider(150),
-                      characterInfo('Actor / Actress : ', character.name),
+                      characterInfo('Status : ', character.statusIfDeadOrAlive),
+                      buildDivider(300),
+                      character.betterCallSaulAppearance.isEmpty
+                          ? Container()
+                          : characterInfo('Better Call Saul Seasons : ',
+                              character.betterCallSaulAppearance.join(" / ")),
+                      character.betterCallSaulAppearance.isEmpty
+                          ? Container()
+                          : buildDivider(150),
+                      characterInfo('Actor/Actress : ', character.acotrName),
                       buildDivider(235),
-                      const SizedBox(height: 20,),
-                      BlocBuilder<CharactersCubit,CharactersState>(builder:(context,state){
-                        return  checkIfQuotesLoaded(state);
-                      } ),
-
+                      SizedBox(
+                        height: 20,
+                      ),
+                      BlocBuilder<CharactersCubit, CharactersState>(
+                        builder: (context, state) {
+                          return checkIfQuotesAreLoaded(state);
+                        },
+                      ),
                     ],
                   ),
                 ),
-                SizedBox(height: 500,),
+                SizedBox(
+                  height: 500,
+                )
               ],
             ),
           ),
